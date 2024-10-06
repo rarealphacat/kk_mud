@@ -2,6 +2,8 @@ These are written for tintin++
 
 AI - 要先安裝tgpt 才能用
 
+create_char - 創新id (a-z)
+
 eqg - eq機,包含在商店買沒紀錄的,會自動拍賣,提供查詢
 
 whereis - 位置機
