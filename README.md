@@ -9,3 +9,5 @@ whereis - 位置機
 finger.tin - ID 機
 
 pk.tin - 自動pk
+
+spy - war 轉圖形直播
