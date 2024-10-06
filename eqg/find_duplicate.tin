@@ -1,0 +1,15 @@
+#alias {find_duplicate} {
+	#var i $eq_list_size;
+	#while {$i >0} {
+		#list eq_list get $i tmp;
+		#show Checking $i;
+		#var j $i -1;
+		#while {$j > 0} {
+			#list eq_list get $j tmp2;
+			#if {"$tmp" === "$tmp2"} {tell jasmina Duplicate Found $tmp from $i in $j};
+			#math j $j - 1;
+			};
+		#math i $i - 1;
+		};
+	#show done;
+	};

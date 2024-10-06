@@ -1,0 +1,35 @@
+#action {a2 %*$} {
+        #if {"$channel" == "wild"} {
+                #var a2_choice %1;
+		#format a2_choice %l $a2_choice;
+                get_size;
+                #if {$query_started == 0} {
+                        #var query_started 1;
+                        #loop 1 $eq_list_size i {
+                                #list eq_list get $i wild_tmp;
+                                #list $wild_tmp get 3 wild_tmp_chi;
+				#format wild_tmp_chi %l $wild_tmp_chi;
+                                #regexp $wild_tmp_chi {{.*}$a2_choice{.*}} {
+                                        #var inclusive_tmp &1;
+                                        #var inclusive_tmp2 &2;
+                                        #if {"$inclusive_tmp" != "" || "$inclusive_tmp2" != ""} {#list wild_query_list add $wild_tmp};
+                                        };
+                                };
+                                }{
+                        copy_list;
+                        #list wild_query_list clear;
+                        #loop 1 $copy_list_size i {
+                                #list copy_list get $i wild_tmp;
+                                #list $wild_tmp get 3 wild_tmp_chi;
+				#format wild_tmp_chi %l $wild_tmp_chi;
+                                #regexp $wild_tmp_chi {{.*}$a2_choice{.*}} {
+                                        #var inclusive_tmp &1;
+                                        #var inclusive_tmp2 &2;
+                                        #if {"$inclusive_tmp" != "" || "$inclusive_tmp2" != ""} {#list wild_query_list add $wild_tmp};
+                                        };
+                                };
+                        };
+                        get_size;
+                        $wild_query_channel 找到$wild_query_list_size件;
+                };
+        };

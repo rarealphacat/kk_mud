@@ -1,0 +1,46 @@
+#action {a3$} {
+        #if {"$channel" == "wild"} {
+                $wild_query_channel {a3a.防具 a3b.匕首 a3c.魔杖 a3d.鎚類 a3e.杖類 a3f.斧類 a3g.劍類 a3h.物品 a3i.矛戟 a3j.刀類 a3k.whip a3l.頭盔 a3m.脛甲 a3n.鞋子 a3o.盾牌 a3p.臂環 a3q.護甲 a3r.披風 a3s.手套 a3t.ring a3u.項鍊};
+                };
+        };
+#action {a3%.$} {
+        #if {"$channel" == "wild"} {
+                #var a3_choice %1;
+                #list letter_number find $a3_choice tmp_num;
+                #if {$tmp_num > 0} {
+                        #if {$query_started == 0} {
+                                #var query_started 1;
+                                get_size;
+                                #list eq_type_list get $tmp_num tmp_type;
+                                #loop 1 $eq_list_size i {
+                                        #list eq_list get $i wild_tmp;
+                                        #if {$tmp_num < 12} {
+                                                #list $wild_tmp get 4 wild_tmp_type;
+                                                #if {"$wild_tmp_type" === "$tmp_type"} {#list wild_query_list add $wild_tmp};
+                                                };
+                                        #if {$tmp_num > 11} {
+                                                #list $wild_tmp get 10 wild_tmp_type;
+                                                #if {"$wild_tmp_type" === "$tmp_type"} {#list wild_query_list add $wild_tmp};
+                                                };
+                                        };
+                                }{
+                                copy_list;
+                                #list wild_query_list clear;
+                                #list eq_type_list get $tmp_num tmp_type;
+                                #loop 1 $copy_list_size i {
+                                        #list copy_list get $i wild_tmp;
+                                        #if {$tmp_num < 12} {
+                                                #list $wild_tmp get 4 wild_tmp_type;
+                                                #if {"$wild_tmp_type" === "$tmp_type"} {#list wild_query_list add $wild_tmp};
+                                                };
+                                        #if {$tmp_num > 11} {
+                                                #list $wild_tmp get 10 wild_tmp_type;
+                                                #if {"$wild_tmp_type" === "$tmp_type"} {#list wild_query_list add $wild_tmp};
+                                                };
+                                        };
+                                };
+                                get_size;
+                                $wild_query_channel 找到$wild_query_list_size件;
+                        };
+                };
+        };

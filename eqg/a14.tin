@@ -1,0 +1,24 @@
+#action {a14 %*$} {
+        #if {"$channel" == "wild"} {
+                #var a14_choice %1;
+                get_size;
+                #if {$query_started == 0} {
+                        #var query_started 1;
+                        #loop 1 $eq_list_size i {
+                                #list eq_list get $i wild_tmp;
+                                #list $wild_tmp get 14 wild_tmp_sk;
+				#if {"$wild_tmp_sk" == "$a14_choice"} {#list wild_query_list add $wild_tmp};
+				};
+			}{
+                        copy_list;
+                        #list wild_query_list clear;
+                        #loop 1 $copy_list_size i {
+                                #list copy_list get $i wild_tmp;
+                                #list $wild_tmp get 14 wild_tmp_sk;
+                                #if {"$wild_tmp_sk" == "$a14_choice"} {#list wild_query_list add $wild_tmp};
+	                        };
+			};
+		get_size;
+		$wild_query_channel 找到$wild_query_list_size件;
+                };
+        };

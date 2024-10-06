@@ -1,0 +1,34 @@
+#var wild_print_size 12;
+#action {wild query} {
+	normal;
+        clear_var;
+        #var channel wild;
+	#var content detail;
+        #show Channel Changed -> wild;
+        #var query_started 0;
+        #if {"$wild_query_channel" == "say"} {
+		$wild_query_channel 請輸入以下 a1.中文名 a2.ID a3.種類(有bug?) a8.需要技能 a13.使用等級(防具用) a14.產地 a15.附加(屬性中文) a18.封印(英文) a19.有特攻 (共有$eq_list_size件);
+		}{
+		$wild_query_channel 請輸入以下 a1.中文名 a2.ID a3.種類(有bug?) a8.需要技能 a13.使用等級(防具用) a14.產地 a15.附加(屬性中文) a18.封印(英文) a19.有特攻;
+		};
+	$wild_query_channel 完成後 print*wild(用空格代替*);
+        };
+
+#action {print wild} {
+        #if {"$channel" == "wild"} {
+                get_size;
+                #if {$wild_query_list_size < $wild_print_size} {
+                        #ticker {print_wild} {
+                                #list wild_query_list get 1 print_wild_result;
+                                #list $print_wild_result get 3 tmp;
+                                eq query $tmp;
+                                #list wild_query_list delete 1;
+                                get_size;
+                                #if {$wild_query_list_size == 0} {#unticker print_wild;reset_channel};
+                                } {4.5};
+                        }{
+                        $wild_query_channel $wild_query_list_size items matches, 太多件了不能盡說;
+                        };
+                };
+        };
+#alias {copy_list} {get_size;#loop 1 $wild_query_list_size i {#list wild_query_list get $i copy_tmp;#list copy_list add $copy_tmp};get_size};

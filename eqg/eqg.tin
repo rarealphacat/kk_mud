@@ -1,0 +1,407 @@
+#var eq_db_file eq_db_colored.txt;
+#nop content options 1) compact 2) simple 3) detail;
+#var content compact;
+
+#if {"$whoami" == "rainbowpocky"} {
+	#var wild_query_channel rr;
+	}{
+	#var wild_query_channel rr;
+	};
+
+#var auc_channel auc;
+#nop eqg directory
+#var query_channel #show;
+#var dir eqg/;
+#var bid_max_random 3500000;
+#var bid_max 100000;
+
+#var variable_tin variable.tin;
+#var wild_tin wild.tin;
+#var buy_check_tin buy_check.tin;
+#var a1_tin a1.tin;
+#var a2_tin a2.tin;
+#var a3_tin a3.tin;
+#var a8_tin a8.tin;
+#var a13_tin a13.tin;
+#var a15_tin a15.tin;
+#var a14_tin a14.tin;
+#var a18_tin a18.tin;
+#var a19_tin a19.tin;
+#var eqg_event_tin eqg_event.tin;
+#var report_boss rainbowpocky;
+#var report_boss2 jasmina;
+#var report_boss3 marygold;
+#var report_boss4 winkel;
+#var auc_one_boss rainbowpocky;
+#var auc_two_boss jasmina;
+
+#gag {把身上%*賣掉};
+#gag {走了過來。$};
+#gag {往%*離開。$};
+#gag {店沒有這種東西 !}
+#gag {本店目前還有 :};
+#gag {你的 auc 頻道已經打開了};
+#gag {關閉 auc 頻道};
+#gag {你身上沒有這種東西。};
+#gag {== (ENTER 繼續下一頁﹐q};
+
+#class eq_db open;
+#list eq_list create;
+#class eq_db close;
+
+#read $dir$eq_db_file;
+#read $dir$variable_tin;
+#if {"$whoami" == "rainbowpocky"} {#read $dir$wild_tin};
+#read $dir$buy_check_tin;
+#read $dir$a1_tin;
+#read $dir$a2_tin;
+#read $dir$a3_tin;
+#read $dir$a8_tin;
+#read $dir$a13_tin;
+#read $dir$a14_tin;
+#read $dir$a15_tin;
+#read $dir$a18_tin;
+#read $dir$a19_tin;
+
+#var skip 0;
+#var stop 0;
+#var listing 0;
+#var shopping 0;
+#gag {^%*(%*)%s%d 枚金幣}
+#list eq_category size category_size;
+#action {~提供的%*(%*)一%*起價 %d 枚金幣} {
+	#format result {%t} {%Y-%m-%d %H:%M:%S};
+	#if {"$whoami" == "$auc_one_boss"} {
+	        #line log chat.log {R %1 %2 \};
+	        #line log chat.log;
+		}{
+                #line log chat.log {J %1 %2 \};
+                #line log chat.log;
+                };
+	#show Channel Changed -> auc;#var channel auc;
+	#var content simple;
+	#var auc_item %2;
+	#var bid %4;
+	#format auc_item %l $auc_item;
+	eq query $auc_item;
+	};
+#action {~名稱 : %*(%*)%s重量 : %d%s價值%s%d%s枚金幣} {#var chi_name_color %1;#var en_name %2;#var mass %4;#var value %7;#show color_to_mono $chi_name_color};
+#action {color_to_mono %*} {#var chi_name %1;#show $chi_name $en_name $mass $value};
+#action {型式 : %*%s等級 : %d%s需要技能 : %d%s最大傷害力 : %d} {#var type %1;#var lv %3;#var sk_req %5;#var max_dmg %7;#show $type $lv $sk_req $max_dmg};
+#action {型式 : %*%s防具種類 : %*%s防具等級 : %d%s傷害吸收力 : %d} {#var type %1;#var eq_type %3;#var eq_lv %5;#var dmg_absorb %7;#show $type $eq_type $eq_lv $dmg_absorb};
+#action {製造地 : %*} {#var origin %1;#show $origin};
+#action {封印魔法 : %*(%*)} {#var seal_chi %1;#var seal_en %2;#show $seal_chi $seal_en};
+#action {使用等級 : %d%s製造地 : %*} {#var lv_req %1;#var origin %3;#show $lv_req $origin};
+#action {附加值 : %*%s: %d} {#var addition %1;#var addition_value %3;#show $addition $addition_value};
+#action {武器特攻 : %*} {#var special %1;#show $special};
+#action {型式 : 物品} {#var origin item;#var type 物品};
+#action {但是什麼都沒有感應到。} {identify $tmp};
+#action {你沒有這件東西 !} {#var skip 1};
+#class {shopping} {open};
+#action {^%*(%*)%s%d 枚金幣} {#var one %1;#var two %2;#format two %l $two;#list shop_list_chi_name add $one;#list shop_list_en_name add $two;#list shop_list_value add %4};
+#action {本店沒有這種} {#var stop 0};
+#class {shopping} {close};
+#class {view_eq} {open};
+#action {ˇ%*(%*)} {reset_channel;#var content compact;#var chi_name %1;#var en_name %2;#format en_name %l $en_name;#list en_name_list add $en_name;find_eq_by_en_name};
+#class {view_eq} {close};
+#class {check_eq} {open};
+#action {給妳一%.%*} {#var chi_name %2;l};
+#action {$chi_name(%*)} {#show %2};
+#class {check_eq} {close};
+#alias {reset_channel} {#var channel  ;};
+#alias {add_eq} {
+	#read $dir$eq_db_file;
+	#class eq_db open;
+	#list eq_list add $origin$chi_name$en_name;
+	#list $origin$chi_name$en_name create;
+	#list $origin$chi_name$en_name add $chi_name_color;
+	#list $origin$chi_name$en_name add $chi_name;
+	#list $origin$chi_name$en_name add $en_name;
+	#list $origin$chi_name$en_name add $type;
+	#list $origin$chi_name$en_name add $mass;
+	#list $origin$chi_name$en_name add $value;
+	#list $origin$chi_name$en_name add $lv;
+	#list $origin$chi_name$en_name add $sk_req;
+	#list $origin$chi_name$en_name add $max_dmg;
+	#list $origin$chi_name$en_name add $eq_type;
+	#list $origin$chi_name$en_name add $eq_lv;
+	#list $origin$chi_name$en_name add $dmg_absorb;
+	#list $origin$chi_name$en_name add $lv_req;
+	#list $origin$chi_name$en_name add $origin;
+	#list $origin$chi_name$en_name add $addition;
+	#list $origin$chi_name$en_name add $addition_value;
+	#list $origin$chi_name$en_name add $seal_chi;
+	#list $origin$chi_name$en_name add $seal_en;
+	#list $origin$chi_name$en_name add $special;
+	#list $origin$chi_name$en_name add $desc;
+	#class eq_db write $dir$eq_db_file;
+	#class eq_db close;
+	};
+#alias {clear_var} {
+	#list shop_list_chi_name clear;
+	#list shop_list_en_name clear;
+	#list shop_list_value clear;
+	#list wild_query_list clear;
+	#list copy_list clear;
+	#var found 0;
+	#var chi_name_color 0;
+	#var chi_name 0;
+	#var add 0;
+	#var en_name 0;
+	#var type 0;
+	#var mass 0;
+	#var value 0;
+	#var lv 0;
+	#var sk_req 0;
+	#var max_dmg 0;
+	#var eq_type 0;
+	#var eq_lv 0;
+	#var dmg_absorb 0;
+	#var lv_req 0;
+	#var origin 0;
+	#var addition 0;
+	#var addition_value 0;
+	#var seal_chi 0;
+	#var seal_en 0;
+	#var special 0;
+	#var desc 0;
+	#var skip 0;
+	#var can_add 0;
+	#var temp_desc  ;
+	};
+#alias {check_data} {
+	#var can_add 0;
+	#if {"$chi_name" != "0" && "$en_name" != "0"} {#var can_add 1};
+	};
+#alias {eq_identify %*} {
+	#var tmp %1;
+	clear_var;
+	identify $tmp;
+	#delay {4} {
+		#delay {3} {
+			#delay {3} {
+				look $tmp;
+				capture desc;
+				#var in_id $origin$chi_name$en_name;
+				#nop find item exist in eq list;
+				#list eq_list find $in_id result;
+				#nop find item exist in eq list (special symbol won't match in list find);
+				#if {$result == 0} {
+					#replace in_id {\\} {};
+					#replace in_id {\} {};
+					#replace in_id { } {};
+					#loop 1 $eq_list_size z {
+						#list eq_list get $z check_tmp;
+						#replace check_tmp {\\} {};
+						#replace check_tmp {\} {};
+						#replace check_tmp { } {};
+						#if {"$check_tmp" === "$in_id"} {#var result $z;#break};
+						};
+					};
+				check_data;
+				#show result_found $result, can_add(have both chi en name) $can_add, skip $skip, chi_name $chi_name, en_name $en_name, origin $origin, in_id $in_id checktmp $check_tmp;
+				#if {$result ==0 && $can_add == 1} {
+					#delay {3} {
+						#if {$skip == 0} {
+							add_eq;
+							#show EQ $eq_list_size $chi_name_color $en_name $origin added;
+							tell $report_boss EQ $eq_list_size $chi_name_color $en_name $origin added;
+							#if {"$whoami" == "$report_boss3" || "$whoami" == "$report_boss4"} {
+								tell $report_boss update;
+								tell $report_boss2 update;
+								};
+							#if {"$whoami" == "drip"} {
+								tell $report_boss3 114_to_104;
+								tell $report_boss4 114_to_104;
+								};
+							#line log chat.log {#show EQ $eq_list_size $chi_name_color $en_name $origin added};
+							#if {$shopping == 1} {#delay {1} {drop all;#var listing 0;shop}};
+							}{
+							#show EQ add skipped;
+							};
+						};
+					}{
+					#delay {3} {
+						#show 已有紀錄 result $result stop $stop can_add $can_add in_id $in_id;
+							drop all;
+						#if {$shopping == 1} {#delay {3} {#var listing 0;shop}};
+						};
+					};
+				#if {"$whoami" == "$auc_one"} {
+					#delay {45} {
+						#auc_one drop all;
+						#auc_one quit;
+						#auc_one_boss eqg;
+						};
+					};
+				};
+			};
+		};
+	};
+#alias {get_size} {
+	#list eq_list size eq_list_size;
+	#list shop_list_en_name size shop_size;
+	#list en_name_list size en_name_list_size;
+	#list wild_query_list size wild_query_list_size;
+	#list copy_list size copy_list_size;
+	};
+#alias {capture desc} {
+	#var desc  ;
+	#event {RECEIVED LINE} {#var desc $desc \%\0};
+	#read $dir$eqg_event_tin;
+	#delay {1} {
+		#unevent {RECEIVED LINE};
+		};
+	};
+#alias {shop} {
+	#if {$stop == 0 && $listing == 0} {
+		list;
+		#var listing 1;
+		#var stop 0;
+		#delay {3} {buy_check};
+		};
+	};
+#alias {stop eqg} {#var stop 1};
+#alias {status_shopping} {#var shopping 1};
+#alias {status_normal} {#var shopping 0};
+#alias {print_eq_info} {
+	#var print_tmp  ;
+	#var print_category  ;
+	#var print_result  ;
+	#if {"$content" == "simple"} {
+		#loop 4 19 m {
+			#if {$m != 2} {
+				#list $tmp get $m print_tmp;
+				#list eq_category get $m print_category;
+				#if {"$print_tmp" != "0"} {#var print_result $print_result  $print_category:$print_tmp};
+				};
+			};
+		};
+	#if {"$content" == "detail"} {
+		 #loop 1 19 m {
+			#if {$m != 2} {
+	                        #list $tmp get $m print_tmp;
+	                        #list eq_category get $m print_category;
+	                        #if {"$print_tmp" != "0"} {#var print_result $print_result  $print_category:$print_tmp};
+				};
+                        };
+                };
+	#if {"$content" == "compact"} {
+		#list compact_no size compact_size;
+		#loop 1 $compact_size m {
+			#if {$m != 2} {
+				#list compact_no get $m n;
+				#list $tmp get $n print_tmp;
+				#list eq_category get $n print_category;
+				#if {"$print_tmp" != "0"} {#var print_result $print_result  $print_category:$print_tmp};
+				};
+			};
+		};
+	#list $tmp get 20 temp_desc;
+	#if {"$channel" == "auc"} {
+		$auc_channel $print_result;$auc_channel $temp_desc;reset_channel;
+		}{
+		#if {"$channel" == "wild"} {
+			$wild_query_channel $print_result;
+			$wild_query_channel $temp_desc;
+			} {
+			$query_channel $print_result;
+			#if {"$content" == "detail"} {$query_channel $temp_desc};
+			};
+		};
+	};
+#alias {find_eq_by_en_name} {
+	get_size;
+	#loop 1 $en_name_list_size l {
+		#var found 0;
+		#loop 1 $eq_list_size k {
+			#list eq_list get $k tmp;
+			#list $tmp get 3 tmp2_en_name;
+			#format tmp2_en_name %l $tmp2_en_name;
+			#list en_name_list get 1 en_name_list_1st;
+			#if {"$channel" == "wild"} {
+				#regexp $tmp2_en_name {{.*}$en_name_list_1st{.*}} {
+					#var inclusive_tmp &1;
+					#var inclusive_tmp2 &2;
+					#if {"$inclusive_tmp" != "" || "$inclusive_tmp2" != ""}{print_eq_info;#var found 1};
+					};
+				}{
+				#if {"$en_name_list_1st" === "$tmp2_en_name"} {print_eq_info;#var found 1};
+				};
+			};
+		#if {$k == $eq_list_size && $found == 0} {
+			#show $en_name_list_1st No Record;
+			#if {"$channel" == "auc"} {
+				#var auc_item_ignore1 "";
+				#var auc_item_ignore2 "";
+			        #regexp $auc_item {{.*}({.*}} {
+			                #var auc_item_ignore1 &1;
+			                #var auc_item_ignore2 &2;
+					};
+		                #if {"$auc_item_ignore1" != "" || "$auc_item_ignore2" != ""}{
+		                        #line log chat.log {Special characters detected, bidding ignored};
+		                        }{
+	                                #var auc_bid 1;
+	                                random_bid_max;
+	                                #show Bid Max $bid_max + $bid_max_random_result , $bid_temp;
+	                                auto_bid;
+			                };
+				};
+			};
+		#list en_name_list delete 1;
+		};
+	};
+
+#alias {random_bid_max} {
+	#var bid_temp 0;
+	#math bid_max_random_result 1d$bid_max_random;
+	#math bid_temp $bid_max + $bid_max_random_result;
+	};
+
+#alias {auto_bid} {
+	#if {$auc_bid == 1} {
+		#math bid_random 1d50000;
+		#math place_bid $bid + $bid_random + 100;
+		#show Bid Max $big_temp, my bid $place_bid;
+		#if {$place_bid < $bid_temp} {auc $place_bid};
+		};
+	};
+#action {【拍賣】大嘴鳥: 拍賣%*一件，第 2 次喊價 %d 枚金幣。} {
+	#var bid %2;
+	auto_bid;
+	};
+
+#alias {call_auc_one} {
+	#session auc_one kk.muds.idv.tw 4000 eqg/auc_identify.tin;
+	};
+
+#action {【拍賣】大嘴鳥: 恭喜%*花了 %* 枚金幣買到了} {
+	#var auc_bid 0;
+	};
+
+#action {一隻大嘴鳥飛了過來%*又急急忙忙地飛走了。} {
+	#if {"$whoami" == "$auc_one_boss"} {call_auc_one};
+	};
+
+#alias {eq query %*$} {
+	#var en_name %1;
+	#format en_name %l $en_name;
+	#list en_name_list add $en_name;
+	find_eq_by_en_name;
+	};
+#alias {tobuy %*$} {#list tobuy add {%1}};
+#alias {detail} {#var content detail};
+#alias {simple} {#var content simple};
+#alias {compact} {#var content compact};
+#alias {write_db} {#class eq_db write $dir$eq_db_file;#show Done};
+#alias {check_all} {
+        #action {  %*(%*)$} {reset_channel;#var content compact;#var chi_name %%1;#var en_name %%2;#format en_name %l $en_name;#list en_name_list add $en_name;find_eq_by_en_name};
+        };
+#alias {normal} {
+        #unaction {  %*(%*)$}
+        };
+get_size;
+#show {\e[1;33m EQg loaded, Database Size $eq_list_size, $content mode (compact/simple/detail)};
+#show {\e[1;33m Functions: shop, eq query(wild) + item id, eq identify, add_eq, stop eqg, print_wild};
+#show {\e[1;33m 查看所有物品(包括地上) check_all, 還原 normal};
+#show {\e[1;33m wild_print_size $wild_print_size};

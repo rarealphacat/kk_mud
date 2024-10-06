@@ -1,0 +1,29 @@
+#action {^您的%*文名字(新人物請輸入'new'} {drip};
+#action {^請輸入密碼﹕} {
+	#var whoami drip;
+        scruffy;
+	eqg;
+        #delay {5} {
+		#rainbowpocky #auc_one #var auc_item $auc_item;
+                w;
+		get $auc_item;
+		e;
+		eq_identify $auc_item;
+                };
+        };
+#config charset BIG5TOUTF8
+#config {repeat enter} on
+#config wordwrap off
+#config speedwalk on
+#config verbose off
+#config {color patch} on
+#config {packet patch} {0.15}
+#config {repeat enter} {on}
+#sp
+
+#alias {eqg} {#read eqg/eqg.tin};
+#var whoami auc_one;
+
+#action {你沒有這件東西 !} {tell rainbowpocky 你沒有這件東西 !;#zap};
+
+#action {== (ENTER 繼續下一頁﹐q} {#cr}

@@ -1,0 +1,75 @@
+#alias {buy_check}{
+        #var buy 1;
+        #var i 1;
+        #var j 1;
+        get_size;
+        #var shopping 1;
+        #while {$buy == 1 && $i < $shop_size} {
+                #list shop_list_en_name get $i tmp;
+                #list shop_list_chi_name get $i tmp_chi;
+                #while {$buy ==1 && $j <= $eq_list_size} {
+                        #var ignore1  ;
+                        #var ignore2  ;
+                        #var ignore3  ;
+                        #list eq_list get $j tmp2;
+                        #list $tmp2 get 3 tmp2_en_name;
+                        #list $tmp2 get 2 tmp2_chi_name;
+                        #format tmp2_en_name_l %l $tmp2_en_name;
+                        #regexp $tmp {{.*}({.*}} {
+                                #var ignore1 &1;
+                                #var ignore2 &2;
+                                #if {"$ignore1" != "" || "$ignore2" != ""}{
+                                        #var ignore3 1;
+                                        #math j $eq_list_size +1;
+                                        #var buy 0;
+                                        };
+                                };
+                        #nop #if "$tmp" === "$tmp2_en_name_l" && "$tmp_chi" === "$tmp2_chi_name";
+			#if {"$tmp" === "$tmp2_en_name_l"} { 
+				#math j $eq_list_size +1;
+				#var buy 0;
+				} {
+				#math j $j +1;
+				};
+                        };
+                #if {$buy == 1} {
+			#show 1 $tmp 2 $tmp2_en_name_l 3 $tmp_chi 4 $tmp2_chi_name;
+                        #show 1 i $i j $j shopsize $shop_size;
+			buy $tmp;
+			#var buy_identify 1;
+			#var buy 0;
+			eq_identify $tmp;
+			} {
+			#var buy 1;
+			#math i $i +1;
+			#var j 1;
+			};
+                };
+        #if {$i >= $shop_size} {
+		#nop #show EQ $eq_list_size i $i j $j shopsize $shop_size Nothing to buy!;
+		#delay {2} {
+			buy_special;
+			clear_var;
+			#delay {2} {
+				#var listing 0;
+				#delay {60} {
+					shop;
+					};
+				};
+			};
+		};
+        };
+
+#alias {check_tobuy} {
+	#list tobuy size tobuy_size;
+	#list tobuy get 1 tobuy_item;
+	#list shop_list_en_name find $tobuy_item;
+	#if {$test > 0} {buy $tobuy_item;drop all;#list tobuy delete 1};
+	};
+
+#alias {buy_special} {buy worn-out robe;auc;auc worn-out robe for 1;tune auc};
+
+#alias {114_to_104} {
+	#system {wget -N -S ftp://kevin:tfelbb28@192.168.1.114//home/kevin/kktintin/utf8/eqg/eq_db_colored.txt -P /kktintin/eqg/ -v};
+	eqg;
+	};
