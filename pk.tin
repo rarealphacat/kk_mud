@@ -1,0 +1,249 @@
+#var smartpk 1;
+#var looked 0;
+#var converted 0;
+#var pinging 0;
+#var pingtime 0.28;
+#var ping_count 0;
+#var round_time 0;
+#var fighting 0;
+#send {party form};
+#send {party talk kill who drink ? potion};
+#send {set brief 1};
+#noop SET Alias A == DRINK POTION !!!
+#noop send {alias a drink potion};
+#alias {callresidualcmd} {#var cmdpoolticker 1;callcmdpoolflow;#ticker {cmdpool} {callcmdpoolflow} {$round_time}};
+#alias {callcmdpoolflow} {
+	#ticker {cmdpoolflow} {
+		#if {$countcmd > 0} {
+			#math countcmd $countcmd - 1;
+			#if {($countcmd < 2) && ($prepareberserk == 1)} {
+				#var prepareberserk 0;
+				0;
+				addcmd;
+				};
+			#if {($countcmd < 4) && ($needberserk == 1)} {
+				0;
+				0;
+				berserk;
+				#var needberserk 0;
+				addcmd;
+				addcmd;
+				addcmd;
+				};
+			};
+		#if {$countcmd == 0} {
+			#var cmdpoolticker 0;
+			#unticker cmdpool;
+			#unticker cmdpoolflow;
+			};
+		} {
+		$pingtime;
+		};
+	};
+#alias {addcmd} {#if {$cmdpoolticker == 0} {callresidualcmd};#math countcmd $countcmd + 1;#show coundcmd $countcmd}
+#alias {showinfo} {#show Hp Rating $hprating, Previous Rating $previoushprating, Danger Lv $dangerlevel, Drank $drankamount, Countcmd $countcmd};
+#alias {dying} {0;addcmd;#math drankamount $drankamount + 1};
+#alias {dying_berserk} {0;addcmd};
+#alias {mathdangerlevel} {#math dangerlevel $hprating - $previoushprating;#if {$dangerlevel < 0} {#var dangerlevel 1}};
+#alias {on} {#config {convert meta} on};
+#alias {off} {#config {convert meta} off};
+#alias {ping} {#var pinging 1;#ticker {test} {tell rotkaeppchen ping testing $pingtime $ping_count/61} {$pingtime}};
+#alias {ping_plus_1} {#math pingtime $pingtime + 0.01};
+#alias {ping_reset} {#var pingtime 0.23;#var ping_count 0;#show Ping Time set to 0.23!};
+#alias {ping_complete} {pp kill awn drink 2 potion;#show !!!!!! PK Robot STARTED !!!!!!;say 血的氣味,暴力的聲音,痛苦的慘叫.....我最喜歡這些了!};
+#event {RECEIVED INPUT} {#math countcmd $countcmd + 1;#if {$cmdpoolticker == 0} {callresidualcmd}};
+
+#action {ping testing} {
+	#if {$ping_count < 61} {
+		#math ping_count $ping_count + 1;
+		} {
+		#var pinging 0;
+		#unticker test;
+		#math round_time $pingtime *7;
+		#show Ping Completed! Time set to $pingtime, Round time $round_time;
+		ping_complete;
+		};
+	};
+
+#action {帽旅行團】「院護衛」小～帽(Rotkaeppchen) : kill %w drink %d potion} {#var countcmd 6;#var target %1;#var drink %2;#var subtract 1;callresidualcmd};
+#action {【%*船長旅行團】%*船長(Captainhook) : kill %w drink %d potion} {#var countcmd 6;#var target %3;#var drink %4;#var subtract 1;callresidualcmd};
+#action {【金神旅行團】金神(Bullion) : kill %w drink %d potion} {#var countcmd 6;#var target %4;#var drink %5;#var subtract 1;callresidualcmd};
+#action {狂吼一聲, 對你發動狂暴攻擊。} {
+	0;0;0;addcmd;addcmd;addcmd;
+	#var fighting 1;
+	#var drankamount 0;#var hprating 0;
+	#if {$countcmd < 5 } {
+		#if {$berserking == 0} {
+			berserk;
+			addcmd;
+			};
+		};
+	};
+
+#action {^( 妳似乎受了點傷, 但是看起來並不要緊。 )} {
+	#var hprating 1;
+	mathdangerlevel;
+	#var previoushprating 1;
+	}
+#action {^( 你似乎受了點傷, 但是看起來並不要緊。 )} {
+	#var hprating 1;
+	mathdangerlevel;
+	#var previousprating 1;
+	}
+
+#action {^( 妳受了幾處傷, 但是沒有傷到要害。} {
+	#var hprating 2;
+	mathdangerlevel;
+	#var previoushprating 2;
+	}
+#action {^( 你受了幾處傷, 但是沒有傷到要害。 )} {
+	#var hprating 2;
+	mathdangerlevel;
+	#var previoushprating 2;
+	}
+
+#action {^( 妳傷到不少地方, 流了許多鮮血。} {
+	#var hprating 3;
+	mathdangerlevel;
+	
+	#var previoushprating 3;
+	};
+#action {^( 你傷到不少地方, 流了許多鮮血。 )} {
+	#var hprating 3;
+	mathdangerlevel;
+	
+	#var previoushprating 3;
+	};
+
+#action {^( 妳身上到處都是傷口, 血流不止。} {
+	#var hprating 4;
+	mathdangerlevel;
+	#var previoushprating 4;
+	};
+#action {^( 你身上到處都是傷口, 血流不止。 )} {
+	#var hprating 4;
+	mathdangerlevel;
+	#var previoushprating 4;
+	};
+
+#action {^( 妳渾身是血, 受傷極重, 有生命危險。} {
+	#var hprating 5;
+	mathdangerlevel;	
+	#var previoushprating 5;
+	};
+#action {^( 你渾身是血, 受傷極重, 有生命危險。 )} {
+	#var hprating 5;
+	mathdangerlevel;	
+	#var previoushprating 5;
+	};
+
+#action {^( 你已經奄奄一息了。 )} {
+	#math redcount $redcount + 1;
+	#var hprating 6;
+	mathdangerlevel;
+	#var previoushprating 6;
+#nop ~~~ for normal attack and 1st red hp ~~~;
+#nop ~~~ #if {($countcmd < 8) && ($drankamount == 0)} {
+#nop ~~~		#loop 1 $needdrink #send {dying};
+#nop ~~~		};
+#nop ~~~ 重複奄奄一息3次時喝1 ~~~;
+	#if {($countcmd < 7) && ($redcount == 3)} {
+		0;0;addcmd;addcmd;#show RED COUNT $redcount !!!
+		};
+#nop ~~~ To Check hp if commands allowed ~~~;
+	#if {$countcmd < 8} {
+		#if {$looked == 0} {
+			hp;#var looked 1;addcmd;
+			};
+		};
+	#ticker {reset} {#var looked 0;#var redcount 0;#var drankamount 0;#var hprating 0;#unticker reset} {0.2};
+#nop ~~~ To show Danger Level if greater than 1 ~~~;
+	#if {$dangerlevel > 1} {
+		#show ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~;
+		#show ~~~                                  ~~~;
+		#show ~~~        Danger Level $dangerlevel !          ~~~;
+		#show ~~~                                  ~~~;
+		#show ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~;
+		};
+	};
+#action {^( 妳已經奄} {
+	#math redcount $redcount + 1;
+	#var hprating 6;
+	mathdangerlevel;
+	#var previoushprating 6;
+#nop ~~~ for normal attack and 1st red hp ~~~;
+#nop ~~~ #if {($countcmd < 8) && ($drankamount == 0)} {
+#nop ~~~		#loop 1 $needdrink #send {dying};
+#nop ~~~		};
+#nop ~~~ 重複奄奄一息3次時喝1 ~~~;
+	#if {($countcmd < 7) && ($redcount == 3)} {
+		0;0;addcmd;addcmd;#show RED COUNT $redcount !!!
+		};
+#nop ~~~ To Check hp if commands allowed ~~~;
+	#if {$countcmd < 8} {
+		#if {$looked == 0} {
+			hp;#var looked 1;addcmd;
+			};
+		};
+	#ticker {reset} {#var looked 0;#var redcount 0;#var drankamount 0;#var hprating 0;#unticker reset} {0.2};
+#nop ~~~ To show Danger Level if greater than 1 ~~~;
+	#if {$dangerlevel > 1} {
+		#show ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~;
+		#show ~~~                                  ~~~;
+		#show ~~~        Danger Level $dangerlevel !          ~~~;
+		#show ~~~                                  ~~~;
+		#show ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~;
+		};
+	};
+
+#action {體力 :%s-%d/%s%d} {#math negativehp %2/100 + 1;#var prepareberserk 1;#loop 1 $negativehp #send {0;addcmd};#if {$countcmd < 4} {0;addcmd}};
+#action {體力 :-%d/%s%d} {#math negativehp %2/100 + 1;#loop 1 $negativehp #send {0;addcmd};#if {$countcmd < 4} {0;addcmd}};
+#action {:%s-%d/%s%d} {#math negativehp %2/100 + 1;#var prepareberserk 1;#loop 1 $negativehp #send {0;addcmd};#if {$countcmd < 4} {0;addcmd}};
+#action {:-%d/%s%d} {#math negativehp %2/100 + 1;#var prepareberserk 1;#loop 1 $negativehp #send {0;addcmd};#if {$countcmd < 4} {0;addcmd}};
+#action {:%s0/%s%d} {#var prepareberserk 1;0;addcmd;#if {$countcmd < 4} {0;addcmd}};
+
+#action {你狂吼一聲} {#var berserking 1;
+	#var fighting 1;
+	#if {$countcmd < 8} {
+		0;addcmd;
+		#math {randomtest} {1.0d30.0};
+		#math {randomone} {$randomtest/100.0 + 3.75};
+		#delay {$randomone} {
+			#var berserking 0;#if {$countcmd < 4} {berserk;addcmd};
+			#show ~~~~~~~~~~~~~~~Berserk Ready~~~~~~~~~~~~~~~;
+			#if {$countcmd == 4} {#delay {0.5} {#if {$countcmd < 5} {berserk;addcmd}}};
+			#if {$countcmd == 5} {#delay {0.7} {#if {$countcmd < 5} {berserk;addcmd}}};
+			#if {$countcmd > 5} {#delay {3} {#if {($countcmd < 5) && ($berserking ==0)} {berserk;addcmd}}};
+			};
+		};	
+	};
+#action {你已經沒有體力發動狂暴攻擊了。} {#var reber 1;re_berserk};
+#var tooquick 0;
+#var tooquick2 0;
+#action {你的指令下太快了} {
+	#if {$pinging == 1} {ping_plus_1;#var ping_count 0;#unticker test;ping};
+	#if {$pinging == 0} {
+		#math tooquick $tooquick + 1;
+		#delay {0.4} {
+			0;addcmd;
+			#if {$tooquick < 1} {
+				#delay {4} {
+					#var tooquick 0;
+					#var reber 1;
+					re_berserk;
+					};
+				};
+			};
+		};
+	};
+#alias {re_berserk} {#var needberserk 1;#if {$countcmd < 2} {0;0;0;berserk;addcmd;addcmd;addcmd;addcmd;#var reber 0};
+	#math {randomtwo} {1.0d5.0};
+	#math {randomtwo} {$randomtest/10.0 + 3};
+	#delay {#randomtwo} {#if {($countcmd < 1) && ($berserking == 0) && ($needberserk == 1) && ($reber == 1)} {0;0;berserk;addcmd;addcmd;addcmd};
+	}};
+#action {你正忙著呢} {#math tooquick2 $tooquick2 + 1;#if {$tooquick2 < 1} {#delay {0.4} {#if {$countcmd < 4} {berserk;addcmd};#delay {6} {#var tooquick2 0;#var reber 1;re_berserk}}}};
+#action {^你並不在戰鬥中} {k $target;addcmd;#var fighting 0;};
+#action {^你現在不在戰鬥中。} {k $target;addcmd;#var fighting 0;};
+#action {What?} {#delay {1.5} {powerup;#delay {1} {berserk}}};
+
+ping;
