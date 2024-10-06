@@ -1,0 +1,186 @@
+#var search_channel rr;
+#action {whereis %w} {
+    #var searching 1;
+    #var lost %1;
+    #var country_code 1;
+    #var person_found 0;
+    #format lost %n $lost;
+    start_searching;
+    };
+
+#action {(%w)$} {
+	#var lost_temp %1;
+	#if {"$lost_temp" == "$lost"} {#var person_found 1};
+	} {1.0};
+
+#alias {world_size} {
+    #list country_list size world_size;
+    };
+
+#alias {get_country_name} {
+    #list country_list get $country_code country_name;
+    };
+
+#alias {look_country} {
+    #show searcing $country_name;
+    who -p $country_name;
+    #ticker {looking} {person_scan} {3};
+    };
+
+#action {系統負擔} {
+	#if {$searching == 1} {
+		#unticker looking;
+		person_scan
+		};
+	};
+
+#alias {person_scan} {
+    #if {$person_found == 1} {
+	$search_channel    $lost 在 $country_name  ;
+	#unvar lost;
+	#var searching 0;
+	}{
+	#if {$country_code < $world_size} {
+		#math country_code $country_code + 1;
+		get_country_name;
+		look_country;
+		}{
+		$search_channel 找不到 $lost;
+		#unvar lost;
+		#var searching 0;
+		};
+	};
+    };
+
+#alias {start_searching} {
+    world_size;
+    get_country_name;
+    look_country;
+    };
+
+#list country_list add tanglamaya;
+#list country_list add aaron;
+#list country_list add angel_realm;
+#list country_list add arboria;
+#list country_list add ares_realm;
+#list country_list add arterlantis;
+#list country_list add asdurl;
+#list country_list add asgard;
+#list country_list add astronomy;
+#list country_list add baestion;
+#list country_list add bengarna_kingdom;
+#list country_list add black_vs_red;
+#list country_list add blood_world;
+#list country_list add cadmus;
+#list country_list add casamia;
+#list country_list add cavalry_regiment;
+#list country_list add celestial_empire;
+#list country_list add cloud_land;
+#list country_list add cloudy_island;
+#list country_list add comic_kingdom;
+#list country_list add crux_empire;
+#list country_list add dark_angel;
+#list country_list add descrete;
+#list country_list add dollars;
+#list country_list add donkey_island;
+#list country_list add dragon_land;
+#list country_list add dragon_realm;
+#list country_list add dragon_tooth;
+#list country_list add dream;
+#list country_list add dream_elf;
+#list country_list add dream_land;
+#list country_list add dream_star;
+#list country_list add eftia;
+#list country_list add eternal_flame;
+#list country_list add evil_city;
+#list country_list add exile_land;
+#list country_list add fairy_tales;
+#list country_list add fantasy;
+#list country_list add fss;
+#list country_list add future_world;
+#list country_list add girls_kingdom;
+#list country_list add god_city;
+#list country_list add good_kingdom;
+#list country_list add goodness;
+#list country_list add great_empire;
+#list country_list add hala;
+#list country_list add han;
+#list country_list add hasmill_kingdom;
+#list country_list add heaven;
+#list country_list add hell;
+#list country_list add holy_alliance;
+#list country_list add hong_xing;
+#list country_list add illusion_empire;
+#list country_list add iris_islands;
+#list country_list add kyradia;
+#list country_list add land_of_wisdom;
+#list country_list add land_of_wivern;
+#list country_list add legend;
+#list country_list add liang_shan_bo;
+#list country_list add lodoss;
+#list country_list add lost_wailness;
+#list country_list add lyric_ode_corner;
+#list country_list add magic_sword;
+#list country_list add magic_world;
+#list country_list add meistner_realm;
+#list country_list add mercy;
+#list country_list add miao;
+#list country_list add midsummer_dream;
+#list country_list add ming;
+#list country_list add mirror_and_maze;
+#list country_list add model_of_king;
+#list country_list add moon;
+#list country_list add music_heaven;
+#list country_list add mystical_land;
+#list country_list add nightmare;
+#list country_list add orc;
+#list country_list add orient;
+#list country_list add paradise;
+#list country_list add peach;
+#list country_list add peacock_empire;
+#list country_list add peerless;
+#list country_list add pegas;
+#list country_list add pharos;
+#list country_list add puzzle_world;
+#list country_list add rocio;
+#list country_list add saer;
+#list country_list add sage_relics;
+#list country_list add sand_egypt;
+#list country_list add saniya;
+#list country_list add santa_wonderland;
+#list country_list add second_world;
+#list country_list add secret_garden;
+#list country_list add shadow_kingdom;
+#list country_list add shogunate;
+#list country_list add silver;
+#list country_list add silver_city;
+#list country_list add sins;
+#list country_list add sky_kingdom;
+#list country_list add snake_magic;
+#list country_list add south_happy_kingdom;
+#list country_list add star_sky_world;
+#list country_list add sun;
+#list country_list add terlas;
+#list country_list add the_land_of_herlaya;
+#list country_list add the_lost_of_kingdom;
+#list country_list add timberland;
+#list country_list add time_world;
+#list country_list add tisaliya_kingdom;
+#list country_list add traces;
+#list country_list add ture_place;
+#list country_list add twilight_zone;
+#list country_list add ultima;
+#list country_list add underdark;
+#list country_list add violet;
+#list country_list add void;
+#list country_list add war_sky;
+#list country_list add water_dream_world;
+#list country_list add white_land;
+#list country_list add wind;
+#list country_list add wind_city;
+#list country_list add windland;
+#list country_list add wo;
+#list country_list add xeno_zone;
+#list country_list add yaryar;
+#list country_list add zemo_school;
+#list country_list add zyom_realm;
