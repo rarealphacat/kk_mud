@@ -7,3 +7,5 @@ eqg - eq機,包含在商店買沒紀錄的,會自動拍賣,提供查詢
 whereis - 位置機
 
 finger.tin - ID 機
+
+pk.tin - 自動pk
