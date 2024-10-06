@@ -1,0 +1,64 @@
+#all #var ally south_happy_kingdom;
+#all #var foe saniya;
+
+#list kingdoms_en find $ally ally_id;
+#list kingdoms_chi get $ally_id ally_chi;
+#list kingdoms_en find $foe foe_id;
+#list kingdoms_chi get $foe_id foe_chi;
+#var online 0;
+#alias {check_size} {
+        #list foe_death_count size foe_death_size;
+        #list ally_death_count size ally_death_size;
+	#list dc_death_list size dc_death_size;
+        #list foe_class_list size foe_size;
+        #list ally_class_list size ally_size;
+	#list foe_class_onlinelist size foe_online_size;
+	#list ally_class_onlinelist size ally_online_size;
+	#list ally_onlinelist_combined size ally_combined_size;
+	#list foe_onlinelist_combined size foe_combined_size;
+	#list position_a size a_size;
+        #list position_b size b_size;
+        #list position_c size c_size;
+        #list position_d size d_size;
+        #list position_e size e_size;
+	};
+#action {【 英雄%* 】 $foe_chi - %*(%w)$} {
+	check_size;
+	#var class_tmp %1;
+	#replace class_tmp { } {};
+	#var chi_tmp %2;
+        #replace {chi_tmp} {「%*」};
+	#var en_tmp %3;
+	#list foe_en_list find $en_tmp j;
+	#if {$j == 0 && "$whoami" == "spylord"} {
+	        #all #list foe_class_list add {$class_tmp};
+	        #all #list foe_chi_list add $chi_tmp;
+	        #all #list foe_en_list add $en_tmp;
+		#all #list foe_status add 0;
+		#all #list foe_timer add 0;
+		};
+	};
+#action {【 英雄%* 】 $ally_chi - %*(%w)$} {
+        check_size;
+        #var class_tmp %1;
+	#replace class_tmp { } {};
+        #var chi_tmp %2;
+	#replace {chi_tmp} {「%*」};
+	#var en_tmp %3;
+        #list ally_en_list find $en_tmp j;
+        #if {$j == 0 && "$whoami" == "spylord"} {
+                #all #list ally_class_list add {$class_tmp};
+                #all #list ally_chi_list add $chi_tmp;
+                #all #list ally_en_list add $en_tmp;
+		#all #list ally_status add 0;
+		#all #list ally_timer add 0;
+                };
+        };
+
+#alias {ally} {who -k $ally;#delay {2} {who -k $foe}};
+#alias {ally_ticker} {#ticker {ally} {ally} {1}};
+ally;
+#delay {3} {
+	#read spy/playerstrack.tin;
+	#if {"$whoami" == "spylord"} {#read spy/display.tin};
+	};

@@ -1,0 +1,88 @@
+#var empty { };
+#var empty_fill  ;
+#var foe_name {   \\e[1\;31m$foe_chi$foe\\e[0m\};
+#var ally_name {\\e[1\;32m$ally_chi$ally\\e[0m\};
+#var print_sub_title {Watchdog 2-------------------Watchdog 1-------------------Watchdog 3-------------------Watchdog 4-------------------};
+#nop Continuously clear and write txt file
+#alias {get_position_display} {
+	#list ally_en_list find $temp_pos temp_pos_index;
+	#if {$temp_pos_index == 0} {
+		#list foe_en_list find $temp_pos temp_pos_index;
+		#var temp_pos {\e[1;31m$temp_pos \e[0m};
+		#list foe_class_list get $temp_pos_index temp_pos_class;
+		#list foe_status get $temp_pos_index temp_pos_status;
+		#list foe_timer get $temp_pos_index temp_pos_timer;
+		}{
+		#var temp_pos {\e[1;32m$temp_pos \e[0m};
+		#list ally_class_list get $temp_pos_index temp_pos_class;
+		#list ally_status get $temp_pos_index temp_pos_status;
+		#list ally_timer get $temp_pos_index temp_pos_timer;
+		};
+	#if {$temp_pos_index == 0} {#var temp_pos_class  ;#var temp_pos  ;};
+	#if {$temp_pos_status == 0} {#var temp_pos_status  ;};
+	#if {$temp_pos_timer == 0} {#var temp_pos_timer  ;};
+	#if {"$temp_pos_status" == "(斷線)" || "$temp_pos_status" == "(死亡)"} {#var temp_pos_timer  ;};
+	};
+#ticker {display} {
+	check_size;
+#nop	#var max 12;
+	#var max 0;
+	#if {$a_size >= $b_size} {#var max $a_size} {#var max $b_size};
+	#if {$c_size > $max} {#var max $c_size};
+	#if {$d_size > $max} {#var max $d_size};
+	#if {$e_size > $max} {#var max $e_size};
+	#system {
+		echo > spy/monitor.txt;
+		echo '' >> spy/monitor.txt;
+		echo $ally_name死亡$ally_death_size   VS$foe_name死亡$foe_death_size >> spy/monitor.txt;
+		echo $print_sub_title >> spy/monitor.txt;
+		};
+	#loop 1 $max o {
+		#var printline  ;
+#nop extract position c;
+		#list position_c_en get $o temp_pos;
+		get_position_display;
+		#var printline_tmp $temp_pos_class$temp_pos$temp_pos_status$temp_pos_timer;
+		#format length %L $printline_tmp;
+		#math empty_count 29 - $length;
+		#var empty_fill  ;
+		#if {$empty_count > 0} {#loop 1 $empty_count q {#var empty_fill $empty_fill$empty}};
+		#var printline $printline_tmp$empty_fill;
+		#unvar temp_pos;
+#nop extract position b;
+                #list position_b_en get $o temp_pos;
+                get_position_display;
+                #var printline_tmp $temp_pos_class$temp_pos$temp_pos_status$temp_pos_timer;
+                #format length %L $printline_tmp;
+                #math empty_count 29 - $length;
+                #var empty_fill  ;
+                #if {$empty_count > 0} {#loop 1 $empty_count q {#var empty_fill $empty_fill$empty}};
+                #var printline $printline$printline_tmp$empty_fill;
+                #unvar temp_pos;
+#nop extract position d;
+                #list position_d_en get $o temp_pos;
+                get_position_display;
+                #var printline_tmp $temp_pos_class$temp_pos$temp_pos_status$temp_pos_timer;
+                #format length %L $printline_tmp;
+                #math empty_count 29 - $length;
+                #var empty_fill  ;
+                #if {$empty_count > 0} {#loop 1 $empty_count q {#var empty_fill $empty_fill$empty}};
+                #var printline $printline$printline_tmp$empty_fill;
+                #unvar temp_pos;
+#nop extract position e;
+                #list position_e_en get $o temp_pos;
+                get_position_display;
+                #var printline_tmp $temp_pos_class$temp_pos$temp_pos_status$temp_pos_timer;
+                #format length %L $printline_tmp;
+                #math empty_count 29 - $length;
+                #var empty_fill  ;
+                #if {$empty_count > 0} {#loop 1 $empty_count q {#var empty_fill $empty_fill$empty}};
+                #var printline $printline$printline_tmp$empty_fill;
+                #unvar temp_pos;
+#nop extract ally online_list;
+		#system {
+			echo '$printline' >> spy/monitor.txt;
+			};
+		#unvar temp_pos;
+		};
+	} {0.3};

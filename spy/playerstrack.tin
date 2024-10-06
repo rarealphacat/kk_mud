@@ -1,0 +1,311 @@
+#if {"$whoami" != "spylord"} {
+	#nop 開始破壞這裡的一切，搜刮所有值錢的東西，並縱火焚燒。;
+	#nop 這裏的建築物不堪%*的破壞, 發出轟隆巨響, 漸漸倒塌在火焰中。;
+	#nop 一些人影突然從建築中衝了出來, 向;
+	#action {^%*祈求神把%*帶回冒險者之家 ...$} {#var move_out %1;remove_people $move_out};
+	#action {^%*突然接到%*的召喚令, 急急忙忙的走了。$} {#var move_out %1;remove_people $move_out};
+	#action {^%*斷線了。$} {
+                #var temp2 %1;
+                #spylord #list dc_death_list add %1;
+                #list ally_chi_list find $temp2 temp2_index;
+                #if {$temp2_index == 0} {
+                        #list foe_chi_list find $temp2 temp2_index;
+                        #spylord #list foe_status set $temp2_index (斷線);
+			#spylord #list foe_timer set $temp2_index 3;
+                        }{
+                        #spylord #list ally_status set $temp2_index (斷線);
+			#spylord #list ally_timer set $temp2_index 3;
+                        };
+		};
+	#action {^%*重新連線回到這個世界。} {#var move_in %1;add_people $move_in};
+	#action {^$*連線進入這個世界。} {#var move_in %1;add_people $move_in};
+	#action {^%*往%*離開。$} {#var move_out %1;#replace move_out 騎在%*上  ;remove_people $move_out};
+	#action {^%*往%*飄去。$} {#var move_out %1;remove_people $move_out};
+	#action {^%*往%*逃跑了 !$} {#var move_out %1;remove_people %move_out};
+	#action {^%*離開遊戲。$} {#var move_out %1;remove_people $move_out};
+	#action {^%*死了。$} {
+		#var temp2 %1;
+                #list ally_chi_list find $temp2 temp2_index;
+                #if {$temp2_index == 0} {
+                        #list foe_chi_list find $temp2 temp2_index;
+			#if {$temp2_index != 0} {
+	                        #spylord #list foe_status set $temp2_index (死亡);
+				#spylord #list foe_timer set $temp2_index 3;
+				#all #list foe_death_count add 1;
+				};
+                        }{
+                        #spylord #list ally_status set $temp2_index (死亡);
+			#spylord #list ally_timer set $temp2_index 3;
+			#all #list ally_death_count add 1;
+                        };
+		};
+	
+	#alias {remove_people %*} {
+		#var temp %1;
+		#list position_a find $temp temp_index;
+		#if {$temp_index != 0 && "$whoami" == "spylord"} {
+	                #list position_a delete $temp_index;
+	                #list position_a_en delete $temp_index;
+			#spylord #list position_a delete $temp_index;
+			#spylord #list position_a_en delete $temp_index;
+			};
+		#list position_b find $temp temp_index;
+	        #if {$temp_index != 0 && "$whoami" == "watchdogone"} {
+	                #list position_b delete $temp_index;
+	                #list position_b_en delete $temp_index;
+	                #spylord #list position_b delete $temp_index;
+	                #spylord #list position_b_en delete $temp_index;
+	                };
+                #list position_c find $temp temp_index;
+	        #if {$temp_index != 0 && "$whoami" == "watchdogtwo"} {
+	                #list position_c delete $temp_index;
+	                #list position_c_en delete $temp_index;
+	                #spylord #list position_c delete $temp_index;
+	                #spylord #list position_c_en delete $temp_index;
+	                };
+                #list position_d find $temp temp_index;
+	        #if {$temp_index != 0 && "$whoami" == "watchdogthre"} {
+	                #list position_d delete $temp_index;
+	                #list position_d_en delete $temp_index;
+	                #spylord #list position_d delete $temp_index;
+	                #spylord #list position_d_en delete $temp_index;
+	                };
+                #list position_e find $temp temp_index;
+	        #if {$temp_index != 0 && "$whoami" == "watchdogfour"} {
+	                #list position_e delete $temp_index;
+	                #list position_e_en delete $temp_index;
+	                #spylord #list position_e delete $temp_index;
+	                #spylord #list position_e_en delete $temp_index;
+	                };
+	
+		};
+	#action {地上突然升起一道奇怪的門，%*從裡面走了出來。} {#var move_in %1;add_people $move_in};
+	#action {^%*飄了過來。}{#var move_in %1;add_people $move_in};
+	#action {^%*走了過來。$} {#var move_in %1;#replace move_in 騎在%*上  ;add_people $move_in};
+	#alias {add_people %*} {
+		#var temp %1;
+		#list ally_chi_list find $temp temp_index;
+		#if {$temp_index == 0} {
+			#list foe_chi_list find $temp temp_index;
+			#list foe_en_list get $temp_index temp_id;
+			}{
+			#list ally_en_list get $temp_index temp_id;
+			};
+		#list position_a find $temp temp6;
+		#if {"$temp_id" != "0" && "$whoami" == "spylord" && $temp6 == 0} {
+	                #list position_a add $temp;
+	                #list position_a_en add $temp_id;
+			#spylord #list position_a add $temp;
+			#spylord #list position_a_en add $temp_id;
+			};
+		#list position_b find $temp temp6;
+	        #if {"$temp_id" != "0" && "$whoami" == "watchdogone" && $temp6 == 0} {
+	                #list position_b add $temp;
+	                #list position_b_en add $temp_id;
+	                #spylord #list position_b add $temp;
+	                #spylord #list position_b_en add $temp_id;
+	                };
+		#list position_c find $temp temp6;
+	        #if {"$temp_id" != "0" && "$whoami" == "watchdogtwo" && $temp6 == 0} {
+	                #list position_c add $temp;
+	                #list position_c_en add $temp_id;
+	                #spylord #list position_c add $temp;
+	                #spylord #list position_c_en add $temp_id;
+	                };
+		#list position_d find $temp temp6;
+	        #if {"$temp_id" != "0" && "$whoami" == "watchdogthre" && $temp6 == 0} {
+	                #list position_d add $temp;
+	                #list position_d_en add $temp_id;
+	                #spylord #list position_d add $temp;
+	                #spylord #list position_d_en add $temp_id;
+	                };
+		#list position_e find $temp temp6;
+	        #if {"$temp_id" != "0" && "$whoami" == "watchdogfour" && $temp6 == 0} {
+			#show add $temp temp6 $temp6;
+	                #list position_e add $temp;
+	                #list position_e_en add $temp_id;
+	                #spylord #list position_e add $temp;
+	                #spylord #list position_e_en add $temp_id;
+	                };
+		};
+	#action {%*緊握%*, 專心啟動封印其中的力量。} {
+		#nop 歎息之杖;
+		#nop 邪龍杖;
+		#var temp2 %1;
+		#var invoke_wand %2;
+		#if {"$invoke_wand" == "歎息之杖" || "$invoke_wand" == "邪龍杖"} {
+			#list ally_chi_list find $temp2 temp2_index;
+			#if {$temp2_index == 0} {
+				#list foe_chi_list find $temp2 temp2_index;
+				#spylord #list foe_status set $temp2_index (噴火中);
+				#spylord #list foe_timer set $temp2_index 7.5;
+				}{
+				#spylord #list ally_status set $temp2_index (噴火中);
+				#spylord #list ally_timer set $temp2_index 7.5
+				};
+			};
+		};
+	#action {^%*喃喃念道 : 梅加歐依 ～～ 雷依歐依 ～ 霍爾 ...} {
+                #var flare %1;
+                #list ally_chi_list find $flare flare_index;
+                #if {$flare_index == 0} {
+                        #list foe_chi_list find $flare flare_index;
+                        #spylord #list foe_status set $flare_index (Casting 核融合術);
+                        #spylord #list foe_timer set $flare_index 4;
+                        }{
+                        #spylord #list ally_status set $flare_index (Casting 核融合術);
+                        #spylord #list ally_timer set $flare_index 4;
+                        };		
+		};
+	#action {^%*的球體漸漸膨漲, 然後又開始收縮, 最後形成一個漆黑的洞。} {
+                #var flare %1;
+                #list ally_chi_list find $flare flare_index;
+                #if {$flare_index == 0} {
+                        #list foe_chi_list find $flare flare_index;
+                        #spylord #list foe_status set $flare_index (核融合 - 釋放中);
+                        #spylord #list foe_timer set $flare_index 2;
+                        }{
+                        #spylord #list ally_status set $flare_index (核融合 - 釋放中);
+                        #spylord #list ally_timer set $flare_index 2;
+                        };
+                };		
+	#action {^%*手中的黑洞突然散發出強烈的電光, 然後爆炸開來 ...} {
+		#var flare %1;
+                #list ally_chi_list find $flare flare_index;
+                #if {$flare_index == 0} {
+                        #list foe_chi_list find $flare flare_index;
+                        #spylord #list foe_status set $flare_index (核融合 - 自爆);
+                        #spylord #list foe_timer set $flare_index 2;
+                        }{
+                        #spylord #list ally_status set $flare_index (核融合 - 自爆);
+                        #spylord #list ally_timer set $flare_index 2;
+                        };
+                };
+	#action {^%*突然變出一把金光閃閃的巨鎚, 向%*當頭鎚下 ...}{
+                #var hammer %1;
+                #var hammered %2;
+                #list ally_chi_list find $hammer hammer_index;
+                #if {$hammer_index == 0} {
+                        #list foe_chi_list find $hammer hammer_index;
+                        #spylord #list foe_status set $hammer_index (心靈之鎚)->$hammered;
+                        #spylord #list foe_timer set $hammer_index 2.5;
+                        }{
+                        #spylord #list ally_status set $hammer_index (心靈之鎚)->$hammered;
+                        #spylord #list ally_timer set $hammer_index 2.5;
+                        };
+                };
+	#action {^%*在%*的面前畫出各種心靈與魔力的符咒 ...} {
+                #var mind_blast %1;
+                #list ally_chi_list find $mind_blast mind_blast_index;
+                #if {$mind_blast_index == 0} {
+                        #list foe_chi_list find $mind_blast mind_blast_index;
+                        #spylord #list foe_status set $mind_blast_index (心靈爆破);
+                        #spylord #list foe_timer set $mind_blast_index 4.5;
+                        }{
+                        #spylord #list ally_status set $mind_blast_index (心靈爆破);
+                        #spylord #list ally_timer set $mind_blast_index 4.5;
+                        };
+                };
+	#action {^%*喃喃念道 : 梅加雷依 ～～ 波爾 ～ 凱特 ...$}{
+                #var stun %1;
+                #list ally_chi_list find $stun stun_index;
+                #if {$stun_index == 0} {
+                        #list foe_chi_list find $stun stun_index;
+                        #spylord #list foe_status set $stun_index (Casting電擊);
+                        #spylord #list foe_timer set $stun_index 2;
+                        }{
+                        #spylord #list ally_status set $stun_index (Casting電擊);
+                        #spylord #list ally_timer set $stun_index 2;
+                        };		
+		};
+	#action {^%*造出一個電場，電擊所有在場的敵人。$} {
+                #var stun %1;
+                #list ally_chi_list find $stun stun_index;
+                #if {$stun_index == 0} {
+                        #list foe_chi_list find $stun stun_index;
+                        #spylord #list foe_status set $stun_index (電擊);
+                        #spylord #list foe_timer set $stun_index 2.5;
+                        }{
+                        #spylord #list ally_status set $stun_index (電擊);
+                        #spylord #list ally_timer set $stun_index 2.5;
+                        };
+                };
+	#action {^%*握緊%*向%*一揮, 叫道 : 真 ～ 空 ～ 斬 ～ }{
+                #var vacuum_blade %1;
+                #var vacuum_bladeed %3;
+                #list ally_chi_list find $vacuum_blade vacuum_blade_index;
+                #if {$vacuum_blade_index == 0} {
+                        #list foe_chi_list find $vacuum_blade vacuum_blade_index;
+                        #spylord #list foe_status set $vacuum_blade_index (真空斬)->$vacuum_bladed;
+                        #spylord #list foe_timer set $vacuum_blade_index 3;
+                        }{
+                        #spylord #list ally_status set $vacuum_blade_index (真空斬)->$vacuum_bladed;
+                        #spylord #list ally_timer set $vacuum_blade_index 3;
+                        };
+                };
+	#action {^%*握緊%*向天一指, 叫道 : 梅加梅加 ～ 梅加魔達 ～}{
+                #var dancing_sword %1;
+                #var dancing_sworded %3;
+                #list ally_chi_list find $dancing_sword dancing_sword_index;
+                #if {$dancing_sword_index == 0} {
+                        #list foe_chi_list find $dancing_sword dancing_sword_index;
+                        #spylord #list foe_status set $dancing_sword_index (狂舞之劍)->$dancing_sworded;
+                        #spylord #list foe_timer set $dancing_sword_index 3;
+                        }{
+                        #spylord #list ally_status set $dancing_sword_index (狂舞之劍)->$dancing_sworded;
+                        #spylord #list ally_timer set $dancing_sword_index 3;
+                        };
+                };
+	#action {^%*狂吼一聲, 對%*發動狂暴攻擊。} {
+		#var berer %1;
+		#var bered %2;
+	        #list ally_chi_list find $berer berer_index;
+	        #if {$berer_index == 0} {
+	                #list foe_chi_list find $berer berer_index;
+	                #spylord #list foe_status set $berer_index (狂暴中)->$bered;
+	                #spylord #list foe_timer set $berer_index 3.8;
+	                }{
+	                #spylord #list ally_status set $berer_index (狂暴中)->$bered;
+	                #spylord #list ally_timer set $berer_index 3.8;
+	                };
+		};
+	}{
+	#alias {foe_timer} {
+		check_size;
+		#loop 1 $foe_size l {
+			#list foe_timer get $l temp3;
+			#if {$temp3 != 0} {
+				#math temp3 $temp3 -0.1;
+				#list foe_timer set $l $temp3;
+				}{
+				#list foe_status get $l temp4;
+				#if {$temp3 == 0 && ("$temp4" == "(斷線)" || "$temp4" == "(死亡)") } {
+					#show checked;
+					#all #list foe_chi_list get $l temp5;
+					#all remove_people $temp5;
+					};
+				#list foe_status set $l 0;
+				};
+			};
+		};
+	#alias {ally_timer} {
+		check_size;
+		#loop 1 $ally_size m {
+			#list ally_timer get $m temp3;
+			#if {$temp3 != 0} {
+				#math temp3 $temp3 -0.1;
+				#list ally_timer set $m $temp3;
+				}{
+                                #list ally_status get $m temp4;
+                                #if {$temp3 == 0 && ("$temp4" == "(斷線)" || "$temp4" == "(死亡)") } {
+                                        #show checked;
+                                        #all #list ally_chi_list get $m temp5;
+                                        #all remove_people $temp5;
+					};
+				#list ally_status set $m 0;
+				};
+			};
+		};
+	#ticker {foe_countdown} {foe_timer} {0.1};
+	#ticker {ally_countdown} {ally_timer} {0.1};
+	};

@@ -1,0 +1,2 @@
+#class get_kingdom read spy/get_kingdoms.tin;
+#action {共有%*個國家已經連接到這個世界。} {#unaction {^%*(%*)};#read spy/playerslist.tin};

@@ -1,0 +1,10 @@
+#list kingdoms_chi add;
+#list kingdoms_en add;
+#action {^%*(%*)} {
+        #var tmp1 %1;
+        #var tmp2 %2;
+        #format tmp2 %l $tmp2;
+        #list kingdoms_chi add $tmp1;
+        #list kingdoms_en add $tmp2;
+        };
+kingdoms;
