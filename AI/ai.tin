@@ -1,0 +1,9 @@
+#action {AI %*} {
+    stop_ai;
+    #system {echo "%1" > AI/ai_query.log};
+    #system {cat AI/ai_query.log | tr -d '\n\r\t' | tgpt --provider duckduckgo -q -  > AI/response.txt};
+    #system {sed -z 's/\n//g' AI/response.txt > AI/output.txt && mv AI/output.txt AI/response.txt};
+    get_response_length;
+    #show 開始有 $full_response_len 字;
+    load_response;
+    };

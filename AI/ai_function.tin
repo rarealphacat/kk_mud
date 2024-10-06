@@ -1,0 +1,50 @@
+#var ai_channel rr;
+
+#alias {get_response_length} {
+	#system {wc -m < AI/response.txt > AI/response_length.txt};
+	#system {sed -i 's/^/#var full_response_len /' AI/response_length.txt};
+	#system {sed -i 's/$/;/' AI/response_length.txt};
+	#read AI/response_length.txt;
+	};
+
+#alias {fix_response_to_var} {
+	#system {sed -i '/^s/d' AI/response.txt};
+	#system {sed -i 's/^/#var response /' AI/response.txt};
+	#system {sed -i '1s/$/;/' AI/response.txt};
+	};
+
+#alias {load_response} {
+    #if {$full_response_len < 201} {
+	    fix_response_to_var;
+	    #delay {1} {
+	            #read AI/response.txt;
+		    #var full_response_len 0;
+	            $ai_channel $response;
+		    #show full_response_len $full_response_len;
+		    finish_check;
+	            };
+	    }{
+	    #system {sed '1s/^.\{200\}//' AI/response.txt > AI/residual.txt};
+	    #system {sed -n '1s/^\(.\{200\}\).*/\1/p' AI/response.txt > AI/temp_response.txt && mv AI/temp_response.txt AI/response.txt};
+	    fix_response_to_var;
+            #delay {1} {
+                    #read AI/response.txt;
+                    #var full_response_len 0;
+                    $ai_channel $response;
+		    #system {mv AI/residual.txt AI/response.txt};
+		    get_response_length;
+		    #show 還有 $full_response_len 字;
+		    #if {$full_response_len > 0} {load_response};
+		    finish_check;
+                    };
+	    };
+    };
+
+#alias {finish_check} {
+    #if {$full_response_len == 0} {
+		#delay {1} {
+			load_ai;
+			#show Respond ended, reloaded;
+			};
+		};
+    };
