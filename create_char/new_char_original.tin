@@ -1,0 +1,42 @@
+#snoop;
+#action {^您的%*文名字%.新人物請輸入'new'} {#char_id new};
+#config charset BIG5TOUTF8;
+#config {repeat enter} off;
+#config wordwrap off;
+#config speedwalk on;
+#config verbose off;
+#config {color patch} on;
+#config {packet patch} {0.15};
+#action {不合法的名字, 請重新輸入} {#char_id new};
+#action {請輸入您希望的英文名字} {#char_id char_id};
+#action {很抱歉，這個名字已經有人用了 !!$} {#char_id char_id;};
+#action {很抱歉，這個名字已經有人用了 !!你嘗試太多次了。$} {
+        #godmode say char_id 有人用了;
+	#godmode add_letter;
+	#godmode start;
+	};
+#action {密碼的長度至少要五個字元，請重設您的密碼 :} {
+	#godmode say 密碼的長度至少要五個字元，請重設您的密碼 :;
+	#char_id #zap;
+	};
+#action {您兩次輸入的密碼並不一樣﹐請重新設定一次密碼﹕} {
+	#char_id pass;	
+	};
+#action {您的新人物英文名字:} {#char_id char_id};
+#action {您的中文名字} {#char_id char_chi_id};
+#action {請設定您的密碼} {#char_id pass};
+#action {請再輸入一次您的密碼，以確%*您沒記錯} {#char_id pass};
+#action {密碼的長度至少要五個字元，請重設您的密碼 :} {#char_id pass};
+#action {請選擇你的職業} {#char_id class};
+#action {您的性別是男性} {#char_id gender};
+#action {^冒險者之家 -} {
+	#char_id route;
+	#char_id #delay {2} {#char_id finished};
+	};
+
+#alias {finished} {
+        #godmode say char_id 成功;
+        #godmode add_letter;
+        #godmode start;
+        #char_id #zap;
+	};
