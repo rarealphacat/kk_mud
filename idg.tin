@@ -1,0 +1,218 @@
+#unvar id;
+#var finger_channel rr;
+#var result_channel #show;
+#var count 0;
+#var whoami idcheck;
+#var spoof_myself 0;
+#var enable_check 0;
+#var init 1;
+
+#alias {say1} {$finger_channel $check_id 好像開了? 隻;$finger_channel ????????????????};
+
+#alias {clear} {
+	#list id clear;
+	#list unique_ip clear;
+	#list unique_ip_index clear;
+	#list unique_id clear;
+	#list ip_count clear;
+	#var top_value 0;
+	#var top_count 0;
+	};
+#list id create;
+#list unique_ip create;
+#list unique_ip_index create;
+#list unique_id create;
+#list ip_count create;
+#nop #action {^【謠言】某人: %*(%w)被%*殺死了。} {#format tmp %l %2;#show $finger id check $tmp};
+#action {%*(%w)%*(%w)%*(%w)} {
+	#list id add %2;
+	#list id add %4;
+	#list id add %6;
+	} {2};
+#action {%*(%w)%*(%w)$} {
+	#list id add %2;
+	#list id add %4;
+	} {2.1};
+#action {%*(%w)$} {#list id add %2} {2.2};
+#nop #action {(%w)$} {#list id add %1};
+#action {位使用者連線中} {
+	#delay {1} {
+		#unaction {(%w)$};
+		#list id size id_size;
+		#list id get $id_size last_id;
+		#format last_id %l $last_id;
+		begin;
+		};
+	};
+#action {英文代號﹕%w} {#var multi_id %1};
+#action {上次連線地址﹕%*(} {
+        #if {$count == 0} {#var myip %1;#show myip $myip count $count};
+        #math count $count + 1;
+        #var ip %1;
+	#nop ######################################;
+	#nop Change own checking into spoof message;
+	#nop ######################################;
+        #if {"$status" == "check" && "$ip" == "$myip" && $spoof_myself == 1} {
+                say1;
+                #var status ignore;
+		#var enable_check 0;
+                };
+	#if {"$status" == "check"} {
+		get_multi_id;
+		#if {$result_index == 0} {$finger_channel 沒找到} {$finger_channel $check_id 好像開了$result_id 隻;$finger_channel $result_multi};
+		#if {"$finger_channel" == "reply"} {#var finger_channel rr};
+		};
+	#nop #####################################################;
+	#nop reset status back to check after skipping above logic;
+	#nop #####################################################;
+	#if {"$status" == "ignore"} {
+		enable_check;
+		#var status check;
+		};
+	#if {"$status" == "finger" && $count > 1} {
+		find_unique;
+		#if {"$last_id" == "$current_id"} {
+			find_biggest;
+			#list ip_count size ip_size;
+			#list unique_ip get $biggest_loc biggest_id;		
+			get_multi_id;
+			multi_stats;
+			#if {$id_size < 10} {
+				$result_channel 線上人數$id_size,共有$ip_size個IP,最多char$biggest_id,開了$biggest_size隻:$result_multi隻;
+				$result_channel 頭$top_count個人一共開了$top_value隻;
+				};
+			#if {$id_size >11} {
+				#delay {2} {
+	                                $result_channel 線上人數$id_size,共有$ip_size個IP,最多char$biggest_id,開了$biggest_size隻;
+					$result_channel $result_multi;
+	                                $result_channel 首$top_count個開$top_value隻;
+					};
+				};
+			enable_check;
+			antiafk;
+			} {
+			#delay {0.4} {next};
+			};
+		};
+
+	};
+#alias {get_multi_id} {
+	#if {"$status" == "finger"} {#var result_index $biggest_loc;#var ip $biggest_id};
+	#list unique_ip find $ip result_index;
+	#list ip_count get $result_index result_id;
+	#list unique_id get $result_index result_multi;
+	};
+
+#alias {begin} {
+	#var i 1;
+	get_id;
+	finger $current_id;
+	}
+#alias {next} {
+	#math i $i+1;
+	#if {$i <= $id_size} {
+		get_id;
+		finger $current_id;
+		};
+	};
+#alias {get_id} {
+	#list id get $i current_id;
+	#format current_id %l $current_id;
+	};
+#alias {find_unique} {
+	#list unique_ip find $ip unique_ip_index;
+	#if {$unique_ip_index == 0} {
+		#list unique_ip add $ip;
+		#list ip_count add 1;
+		}{
+		#list ip_count get $unique_ip_index tmp;
+		#math tmp $tmp + 1;
+		#list ip_count set $unique_ip_index $tmp;
+		};
+	store_id;	
+	};	
+#alias {find_biggest} {
+	#var biggest_size 0;
+	#loop 1 $id_size j {
+		#list ip_count get $j tmp_size;
+		#if {$tmp_size > $biggest_size} {
+			#var biggest_size $tmp_size;
+			#var biggest_loc $j;
+			};
+		};
+	};
+#action {%*id check %w} {
+	#unvar check_id;
+	#var check_id %2;
+	#if {$enable_check == 1} {
+		#var status check;
+		finger $check_id;
+		};
+	};
+#alias {enable_check} {
+	#var enable_check 1;
+	};
+#alias {disable_check} {
+	#var enable_check 0;
+	};
+#alias {store_id} {
+	#if {$unique_ip_index == 0} {
+		#list unique_id add $multi_id;
+		}{
+		#unvar unique_id_tmp;
+		#list unique_id get $unique_ip_index unique_id_tmp;
+		#var unique_id_tmp $unique_id_tmp,$multi_id;
+		#list unique_id set $unique_ip_index $unique_id_tmp;
+		};
+	};
+#alias {multi_stats} {
+        #list multi_stats clear;
+        #list multi_count clear;
+        #list multi_value clear;
+        #list multi_stats_sorted clear;
+        #loop 1 $ip_size j {
+                #list ip_count get $j tmp_size;
+                #list multi_stats add $tmp_size;
+                };
+        #var big_tmp $biggest_size;
+        #loop $ip_size 1 i {
+                #var counter 0;
+                #while {$counter == 0} {
+                        #list multi_stats find $big_tmp big_tmp_index;
+                        #if {$big_tmp_index >0} {
+                                #list multi_stats_sorted add $big_tmp;
+                                #list multi_stats delete $big_tmp_index;
+                                #var counter 1;
+                                }{
+                                #math big_tmp $big_tmp -1;
+                                }
+                        };
+                };
+        #loop 1 $ip_size j {
+                #list multi_stats_sorted get $j tmp;
+                #list multi_value find $tmp tmp_index;
+                #if {$tmp_index == 0} {
+                        #list multi_value add $tmp;
+                        #list multi_count add 1;
+                        }{
+                        #list multi_count get $tmp_index tmp_value;
+                        #math tmp_value $tmp_value + 1;
+                        #list multi_count set $tmp_index $tmp_value;
+                        };
+                };
+	find_top5;
+        };
+#alias {find_top5} {
+	#loop 1 5 k {#list multi_value get $k tmp;#math top_value $top_value + $tmp};
+	#loop 1 5 k {#list multi_count get $k tmp;#math top_count $top_count + $tmp};
+	};
+clear;
+disable_check;
+#unticker antiafk;
+#var status finger;
+finger $whoami;
+who -l;
+#alias {finger_update} {
+	#read finger.tin;
+	};
+#ticker {finger_update} {finger_update} {1800};
